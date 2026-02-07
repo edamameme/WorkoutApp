@@ -294,23 +294,19 @@
         </div>
       </div>
 
-      <!-- Reps adjuster -->
-      <div class="reps-adjuster">
-        <p class="hint">Actual reps this set:</p>
-        <div class="stepper stepper-lg">
-          <button id="reps-minus" class="stepper-btn">&minus;</button>
-          <span id="actual-reps" class="actual-reps">10</span>
-          <button id="reps-plus" class="stepper-btn">+</button>
+      <!-- Reps & Weight adjusters (vertical up/down arrows, side by side) -->
+      <div class="adjusters-row">
+        <div class="adjuster-col">
+          <span class="adjuster-label">REPS</span>
+          <button id="reps-plus" class="arrow-btn arrow-up">&#9650;</button>
+          <span id="actual-reps" class="adjuster-value">10</span>
+          <button id="reps-minus" class="arrow-btn arrow-down">&#9660;</button>
         </div>
-      </div>
-
-      <!-- Weight adjuster (mid-set) -->
-      <div class="reps-adjuster">
-        <p class="hint">Weight this set (lbs):</p>
-        <div class="stepper stepper-lg">
-          <button id="weight-minus" class="stepper-btn">&minus;</button>
-          <span id="actual-weight" class="actual-reps">0</span>
-          <button id="weight-plus" class="stepper-btn">+</button>
+        <div class="adjuster-col">
+          <span class="adjuster-label">LBS</span>
+          <button id="weight-plus" class="arrow-btn arrow-up">&#9650;</button>
+          <span id="actual-weight" class="adjuster-value">0</span>
+          <button id="weight-minus" class="arrow-btn arrow-down">&#9660;</button>
         </div>
       </div>
 

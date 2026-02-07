@@ -680,26 +680,58 @@ select.text-input {
   margin-top: 4px;
 }
 
-/* Reps / Weight adjuster */
-.reps-adjuster {
-  text-align: center;
+/* Reps / Weight adjusters — vertical up/down arrows side by side */
+.adjusters-row {
+  display: flex;
+  gap: 16px;
   width: 100%;
-}
-.stepper-lg {
   justify-content: center;
-  margin-top: 6px;
 }
-.stepper-lg .stepper-btn {
-  width: 50px;
-  height: 50px;
-  font-size: 1.5rem;
+.adjuster-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  max-width: 140px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 8px;
 }
-.actual-reps {
-  font-size: 1.8rem;
+.adjuster-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.adjuster-value {
+  font-size: 2rem;
   font-weight: 800;
-  min-width: 60px;
-  text-align: center;
   font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.arrow-btn {
+  width: 56px;
+  height: 44px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition);
+}
+.arrow-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+.arrow-btn:active {
+  transform: scale(0.95);
 }
 
 /* Total reps */
@@ -924,6 +956,6 @@ select.text-input {
   .timer-ring { width: 130px; height: 130px; }
   .timer-display { font-size: 1.8rem; }
   .stat-value { font-size: 1.2rem; }
-  .actual-reps { font-size: 1.5rem; }
-  .stepper-lg .stepper-btn { width: 44px; height: 44px; font-size: 1.3rem; }
+  .adjuster-value { font-size: 1.6rem; }
+  .arrow-btn { width: 48px; height: 38px; font-size: 1rem; }
 }
