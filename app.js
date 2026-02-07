@@ -491,15 +491,167 @@ function openSetup() {
     $("previous-stats").classList.remove("hidden");
     $("prev-summary").textContent =
       `${s.lastSets} sets x ${s.lastReps} reps @ ${s.lastWeight} lbs — ${s.lastTotalReps} total reps`;
+
+    // Show last 5 sessions
+    const history = (s.history || []).slice(0, 5);
+    if (history.length > 1) {
+      $("history-table").classList.remove("hidden");
+      $("history-table-rows").innerHTML = history.map((h) =>
+        `<div class="history-row">
+          <span class="h-date">${h.date}</span>
+          <span class="h-detail">${h.sets} sets · ${h.totalReps} reps · ${h.maxWeight} lbs</span>
+        </div>`
+      ).join("");
+
+      // Draw progress graph
+      $("progress-graph").classList.remove("hidden");
+      drawProgressGraph(history);
+    } else {
+      $("history-table").classList.add("hidden");
+      $("progress-graph").classList.add("hidden");
+    }
   } else {
     $("input-sets").value = 3;
     $("input-reps").value = 10;
     $("input-weight").value = 0;
     $("input-rest").value = 30;
     $("previous-stats").classList.add("hidden");
+    $("history-table").classList.add("hidden");
+    $("progress-graph").classList.add("hidden");
   }
 
   showScreen("setup");
+}
+
+// ---------- Progress Graph ----------
+function drawProgressGraph(history) {
+  const canvas = $("progress-canvas");
+  const ctx = canvas.getContext("2d");
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.parentElement.getBoundingClientRect();
+  canvas.width = rect.width * dpr;
+  canvas.height = 180 * dpr;
+  ctx.scale(dpr, dpr);
+  const W = rect.width;
+  const H = 180;
+
+  ctx.clearRect(0, 0, W, H);
+
+  // Data is newest-first, reverse for left-to-right chronological
+  const data = [...history].reverse();
+  const n = data.length;
+  if (n < 2) return;
+
+  const reps = data.map((d) => d.totalReps);
+  const weights = data.map((d) => d.maxWeight);
+
+  const padL = 40;
+  const padR = 40;
+  const padT = 25;
+  const padB = 30;
+  const graphW = W - padL - padR;
+  const graphH = H - padT - padB;
+
+  // Scales
+  const maxReps = Math.max(...reps, 1);
+  const maxWeight = Math.max(...weights, 1);
+
+  function xPos(i) { return padL + (i / (n - 1)) * graphW; }
+  function yReps(v) { return padT + graphH - (v / maxReps) * graphH; }
+  function yWeight(v) { return padT + graphH - (v / maxWeight) * graphH; }
+
+  // Get colors from CSS variables
+  const style = getComputedStyle(document.body);
+  const primaryColor = style.getPropertyValue("--primary").trim() || "#4f46e5";
+  const accentColor = style.getPropertyValue("--accent").trim() || "#10b981";
+  const mutedColor = style.getPropertyValue("--text-muted").trim() || "#6b7280";
+  const borderColor = style.getPropertyValue("--border").trim() || "#e5e7eb";
+
+  // Grid lines
+  ctx.strokeStyle = borderColor;
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= 4; i++) {
+    const y = padT + (graphH / 4) * i;
+    ctx.beginPath();
+    ctx.moveTo(padL, y);
+    ctx.lineTo(W - padR, y);
+    ctx.stroke();
+  }
+
+  // Draw reps line
+  ctx.strokeStyle = primaryColor;
+  ctx.lineWidth = 2.5;
+  ctx.lineJoin = "round";
+  ctx.beginPath();
+  data.forEach((d, i) => {
+    const x = xPos(i);
+    const y = yReps(d.totalReps);
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+
+  // Reps dots + labels
+  ctx.fillStyle = primaryColor;
+  data.forEach((d, i) => {
+    const x = xPos(i);
+    const y = yReps(d.totalReps);
+    ctx.beginPath();
+    ctx.arc(x, y, 4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = primaryColor;
+    ctx.font = "bold 10px sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText(d.totalReps, x, y - 8);
+    ctx.fillStyle = primaryColor;
+  });
+
+  // Draw weight line (if any weights > 0)
+  if (maxWeight > 0) {
+    ctx.strokeStyle = accentColor;
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    data.forEach((d, i) => {
+      const x = xPos(i);
+      const y = yWeight(d.maxWeight);
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+
+    // Weight dots + labels
+    ctx.fillStyle = accentColor;
+    data.forEach((d, i) => {
+      const x = xPos(i);
+      const y = yWeight(d.maxWeight);
+      ctx.beginPath();
+      ctx.arc(x, y, 4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = accentColor;
+      ctx.font = "bold 10px sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText(d.maxWeight + " lbs", x, y - 8);
+      ctx.fillStyle = accentColor;
+    });
+  }
+
+  // X axis labels (dates)
+  ctx.fillStyle = mutedColor;
+  ctx.font = "10px sans-serif";
+  ctx.textAlign = "center";
+  data.forEach((d, i) => {
+    const x = xPos(i);
+    const parts = d.date.split("-");
+    ctx.fillText(`${parts[1]}/${parts[2]}`, x, H - 8);
+  });
+
+  // Legend
+  ctx.font = "bold 11px sans-serif";
+  ctx.textAlign = "left";
+  ctx.fillStyle = primaryColor;
+  ctx.fillText("Reps", padL, 14);
+  if (maxWeight > 0) {
+    ctx.fillStyle = accentColor;
+    ctx.fillText("Weight", padL + 45, 14);
+  }
 }
 
 $("back-to-picker").addEventListener("click", () => showScreen("picker"));
@@ -705,6 +857,13 @@ function startRestTimer() {
       if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
 
       logCurrentSet();
+
+      // If last set, finish the exercise
+      if (state.currentSet >= state.totalSets) {
+        finishExercise();
+        return;
+      }
+
       state.currentSet++;
       state.actualReps = state.targetReps;
       updateWorkoutUI();
@@ -729,6 +888,13 @@ $("complete-set-btn").addEventListener("click", () => {
     state.isResting = false;
     $("ring-progress").classList.remove("resting");
     logCurrentSet();
+
+    // If last set, finish the exercise
+    if (state.currentSet >= state.totalSets) {
+      finishExercise();
+      return;
+    }
+
     state.currentSet++;
     state.actualReps = state.targetReps;
     updateWorkoutUI();
@@ -741,13 +907,6 @@ $("complete-set-btn").addEventListener("click", () => {
     state.timerStarted = true;
     state.workoutStartTime = Date.now();
     startElapsedTimer();
-  }
-
-  // Last set — log immediately and finish (no rest needed)
-  if (state.currentSet >= state.totalSets) {
-    logCurrentSet();
-    finishExercise();
-    return;
   }
 
   // Start rest — set will be logged when rest ends so user can adjust reps

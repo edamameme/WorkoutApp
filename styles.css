@@ -456,6 +456,45 @@ select.text-input {
   font-size: 0.9rem;
 }
 
+/* History table (last 5) */
+.history-table {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+}
+.history-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  font-size: 0.85rem;
+  border-bottom: 1px solid var(--border);
+}
+.history-row:last-child {
+  border-bottom: none;
+}
+.history-row .h-date {
+  color: var(--text-muted);
+  min-width: 70px;
+}
+.history-row .h-detail {
+  font-weight: 600;
+  text-align: right;
+}
+
+/* Progress graph */
+.progress-graph {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+}
+.progress-graph canvas {
+  width: 100%;
+  height: 180px;
+  display: block;
+}
+
 /* ---------- Builder ---------- */
 .builder-exercises {
   display: flex;

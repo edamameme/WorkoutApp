@@ -210,6 +210,18 @@
         <p>Last time: <span id="prev-summary"></span></p>
       </div>
 
+      <!-- Last 5 sessions -->
+      <div id="history-table" class="history-table hidden">
+        <p class="hint" style="margin-bottom:8px">Recent sessions:</p>
+        <div id="history-table-rows"></div>
+      </div>
+
+      <!-- Progress graph -->
+      <div id="progress-graph" class="progress-graph hidden">
+        <p class="hint" style="margin-bottom:8px">Progress:</p>
+        <canvas id="progress-canvas" width="400" height="180"></canvas>
+      </div>
+
       <button id="start-workout-btn" class="btn btn-primary btn-lg">Start Workout</button>
     </div>
   </div>
