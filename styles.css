@@ -456,6 +456,29 @@ select.text-input {
   font-size: 0.9rem;
 }
 
+/* Toggle group */
+.toggle-group {
+  display: flex;
+  gap: 0;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+.toggle-btn {
+  padding: 8px 14px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: none;
+  background: var(--surface);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.toggle-btn.active {
+  background: var(--primary);
+  color: var(--primary-text);
+}
+
 /* History table (last 5) */
 .history-table {
   background: var(--surface);

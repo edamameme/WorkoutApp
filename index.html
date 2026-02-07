@@ -206,6 +206,24 @@
         </div>
       </div>
 
+      <!-- Set timer mode toggle -->
+      <div class="setup-field">
+        <label>Set Timer</label>
+        <div class="toggle-group">
+          <button class="toggle-btn active" id="toggle-up" data-mode="up">Count Up</button>
+          <button class="toggle-btn" id="toggle-down" data-mode="down">Count Down</button>
+        </div>
+      </div>
+
+      <div id="set-duration-field" class="setup-field hidden">
+        <label for="input-set-duration">Set Duration (sec)</label>
+        <div class="stepper">
+          <button class="stepper-btn" data-target="input-set-duration" data-dir="-5">&minus;</button>
+          <input type="number" id="input-set-duration" value="30" min="5" max="300" step="5">
+          <button class="stepper-btn" data-target="input-set-duration" data-dir="5">+</button>
+        </div>
+      </div>
+
       <div id="previous-stats" class="previous-stats hidden">
         <p>Last time: <span id="prev-summary"></span></p>
       </div>

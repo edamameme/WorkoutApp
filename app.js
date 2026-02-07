@@ -86,6 +86,10 @@ let state = {
   timerInterval: null,
   timerRemaining: 0,
   isResting: false,
+  isInSet: false,
+  setTimerMode: "up",     // "up" or "down"
+  setDurationSeconds: 30,
+  setElapsed: 0,
 
   // WOD state
   isWod: false,
@@ -674,12 +678,27 @@ document.querySelectorAll(".stepper-btn").forEach((btn) => {
   });
 });
 
+// ---------- Set Timer Mode Toggle ----------
+$("toggle-up").addEventListener("click", () => {
+  state.setTimerMode = "up";
+  $("toggle-up").classList.add("active");
+  $("toggle-down").classList.remove("active");
+  $("set-duration-field").classList.add("hidden");
+});
+$("toggle-down").addEventListener("click", () => {
+  state.setTimerMode = "down";
+  $("toggle-down").classList.add("active");
+  $("toggle-up").classList.remove("active");
+  $("set-duration-field").classList.remove("hidden");
+});
+
 // ================================================================
 //  START WORKOUT (single exercise)
 // ================================================================
 $("start-workout-btn").addEventListener("click", () => {
   state.totalSets = parseInt($("input-sets").value, 10) || 3;
   state.targetReps = parseInt($("input-reps").value, 10) || 10;
+  state.setDurationSeconds = parseInt($("input-set-duration").value, 10) || 30;
   state.weight = parseInt($("input-weight").value, 10) || 0;
   state.restSeconds = parseInt($("input-rest").value, 10) || 30;
   state.isWod = false;
@@ -788,7 +807,12 @@ function resetTimerDisplay() {
   clearInterval(state.timerInterval);
   state.timerInterval = null;
   state.isResting = false;
-  $("timer-display").textContent = "0:00";
+  state.isInSet = false;
+  if (state.setTimerMode === "down") {
+    $("timer-display").textContent = formatTime(state.setDurationSeconds);
+  } else {
+    $("timer-display").textContent = "0:00";
+  }
   $("timer-label").textContent = "READY";
   setRingProgress(1);
   $("ring-progress").classList.remove("resting");
@@ -880,8 +904,9 @@ function updateTimerDisplay() {
   setRingProgress(state.timerRemaining / state.restSeconds);
 }
 
-// ---------- Complete Set ----------
+// ---------- Complete Set / End Set / Skip Rest ----------
 $("complete-set-btn").addEventListener("click", () => {
+  // During rest → skip rest, log set, advance
   if (state.isResting) {
     clearInterval(state.timerInterval);
     state.timerInterval = null;
@@ -889,7 +914,6 @@ $("complete-set-btn").addEventListener("click", () => {
     $("ring-progress").classList.remove("resting");
     logCurrentSet();
 
-    // If last set, finish the exercise
     if (state.currentSet >= state.totalSets) {
       finishExercise();
       return;
@@ -902,6 +926,15 @@ $("complete-set-btn").addEventListener("click", () => {
     return;
   }
 
+  // During set (timer running) → end set early, go to rest
+  if (state.isInSet) {
+    clearInterval(state.timerInterval);
+    state.timerInterval = null;
+    state.isInSet = false;
+    startRestTimer();
+    return;
+  }
+
   // Start the elapsed timer on first tap
   if (!state.timerStarted) {
     state.timerStarted = true;
@@ -909,9 +942,56 @@ $("complete-set-btn").addEventListener("click", () => {
     startElapsedTimer();
   }
 
-  // Start rest — set will be logged when rest ends so user can adjust reps
-  startRestTimer();
+  // Start the set timer
+  startSetTimer();
 });
+
+// ---------- Set Timer (count up / count down) ----------
+function startSetTimer() {
+  state.isInSet = true;
+  state.setElapsed = 0;
+  $("ring-progress").classList.remove("resting");
+  $("timer-label").textContent = "SET";
+
+  if (state.setTimerMode === "down") {
+    // Count down from set duration
+    state.timerRemaining = state.setDurationSeconds;
+    $("timer-display").textContent = formatTime(state.timerRemaining);
+    setRingProgress(1);
+    $("complete-set-btn").textContent = "End Set";
+
+    state.timerInterval = setInterval(() => {
+      state.timerRemaining--;
+      state.setElapsed++;
+
+      if (state.timerRemaining <= 0) {
+        // Set time is up — auto transition to rest
+        clearInterval(state.timerInterval);
+        state.timerInterval = null;
+        state.isInSet = false;
+        playBeep();
+        if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+        startRestTimer();
+        return;
+      }
+
+      $("timer-display").textContent = formatTime(state.timerRemaining);
+      setRingProgress(state.timerRemaining / state.setDurationSeconds);
+    }, 1000);
+  } else {
+    // Count up (stopwatch)
+    $("timer-display").textContent = "0:00";
+    setRingProgress(0);
+    $("complete-set-btn").textContent = "End Set";
+
+    state.timerInterval = setInterval(() => {
+      state.setElapsed++;
+      $("timer-display").textContent = formatTime(state.setElapsed);
+      // Fill ring over 5 minutes max for visual
+      setRingProgress(Math.min(state.setElapsed / 300, 1));
+    }, 1000);
+  }
+}
 
 // ---------- Log Current Set ----------
 function logCurrentSet() {
