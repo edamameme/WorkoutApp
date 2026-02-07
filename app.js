@@ -648,7 +648,7 @@ function resetTimerDisplay() {
   $("timer-label").textContent = "REST";
   setRingProgress(1);
   $("ring-progress").classList.remove("resting");
-  $("complete-set-btn").textContent = "Complete Set";
+  $("complete-set-btn").textContent = "Start Set";
   $("complete-set-btn").disabled = false;
 }
 
