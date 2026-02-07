@@ -577,6 +577,8 @@ function beginExercise(exerciseName) {
   state.setLog = [];
   state.isResting = false;
   state.timerStarted = false;
+  state.workoutStartTime = null;
+  stopElapsedTimer();
 
   // Don't start elapsed timer yet — wait for first "Start Set" tap
 
