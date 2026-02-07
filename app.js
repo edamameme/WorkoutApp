@@ -603,16 +603,11 @@ function beginExercise(exerciseName) {
 }
 
 // ================================================================
-//  ELAPSED TIMER (shown in the ring when not resting)
+//  ELAPSED TIMER (tracks total time internally for done screen)
 // ================================================================
 function startElapsedTimer() {
-  clearInterval(state.elapsedInterval);
-  state.elapsedInterval = setInterval(() => {
-    if (!state.isResting) {
-      const elapsed = Math.floor((Date.now() - state.workoutStartTime) / 1000);
-      $("timer-display").textContent = formatTime(elapsed);
-    }
-  }, 1000);
+  // Just mark the start time — no display updates needed
+  // The ring handles its own display (READY / REST)
 }
 
 function stopElapsedTimer() {
@@ -641,10 +636,8 @@ function resetTimerDisplay() {
   clearInterval(state.timerInterval);
   state.timerInterval = null;
   state.isResting = false;
-  // Show elapsed workout time in the ring (or 0:00 if not started)
-  const elapsed = state.timerStarted ? getElapsedSeconds() : 0;
-  $("timer-display").textContent = formatTime(elapsed);
-  $("timer-label").textContent = state.timerStarted ? "WORKOUT" : "READY";
+  $("timer-display").textContent = "0:00";
+  $("timer-label").textContent = "READY";
   setRingProgress(1);
   $("ring-progress").classList.remove("resting");
   $("complete-set-btn").textContent = "Start Set";
