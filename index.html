@@ -2,13 +2,18 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#4f46e5">
   <title>FitTrack — Workout Tracker</title>
   <link rel="stylesheet" href="styles.css">
+  <link rel="manifest" href="manifest.json">
 </head>
 <body>
-  <!-- ============ EXERCISE PICKER SCREEN ============ -->
-  <div id="screen-picker" class="screen active">
+
+  <!-- ============ HOME SCREEN ============ -->
+  <div id="screen-home" class="screen active">
     <header class="top-bar">
       <h1 class="logo">FitTrack</h1>
       <button id="theme-toggle" class="icon-btn" aria-label="Toggle dark mode">
@@ -17,9 +22,128 @@
       </button>
     </header>
 
-    <div class="picker-body">
-      <h2>Choose an Exercise</h2>
+    <div class="home-body">
+      <!-- Streak -->
+      <div id="streak-card" class="streak-card">
+        <span id="streak-flame" class="streak-flame">&#128293;</span>
+        <div class="streak-info">
+          <span id="streak-count" class="streak-count">0</span>
+          <span class="streak-label">day streak</span>
+        </div>
+        <div class="streak-week" id="streak-week"></div>
+      </div>
 
+      <!-- Main actions -->
+      <button id="nav-wod" class="home-action">
+        <span class="action-icon">&#9889;</span>
+        <div class="action-text">
+          <strong>Start a Workout</strong>
+          <span>Pick a routine or WOD</span>
+        </div>
+        <span class="action-arrow">&rsaquo;</span>
+      </button>
+
+      <button id="nav-quick" class="home-action">
+        <span class="action-icon">&#127947;</span>
+        <div class="action-text">
+          <strong>Quick Exercise</strong>
+          <span>Single exercise, your settings</span>
+        </div>
+        <span class="action-arrow">&rsaquo;</span>
+      </button>
+
+      <button id="nav-history" class="home-action">
+        <span class="action-icon">&#128197;</span>
+        <div class="action-text">
+          <strong>History</strong>
+          <span>Past workouts &amp; calendar</span>
+        </div>
+        <span class="action-arrow">&rsaquo;</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ============ WOD PICKER SCREEN ============ -->
+  <div id="screen-wod" class="screen">
+    <header class="top-bar">
+      <button class="icon-btn back-btn" data-back="home" aria-label="Back">&larr;</button>
+      <h1 class="logo">Workouts</h1>
+      <div style="width:42px"></div>
+    </header>
+
+    <div class="wod-body">
+      <div class="category-tabs">
+        <button class="wod-tab active" data-wod-cat="prebuilt">Pre-built</button>
+        <button class="wod-tab" data-wod-cat="my-routines">My Routines</button>
+      </div>
+
+      <ul id="wod-list" class="exercise-list"></ul>
+
+      <div id="wod-custom-section" class="hidden">
+        <button id="create-routine-btn" class="btn btn-primary btn-lg">+ Create New Routine</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ ROUTINE BUILDER SCREEN ============ -->
+  <div id="screen-builder" class="screen">
+    <header class="top-bar">
+      <button class="icon-btn back-btn" data-back="wod" aria-label="Back">&larr;</button>
+      <h1 class="logo">New Routine</h1>
+      <div style="width:42px"></div>
+    </header>
+
+    <div class="setup-body">
+      <div class="setup-field">
+        <label for="routine-name">Routine Name</label>
+        <input type="text" id="routine-name" class="text-input" placeholder="My Workout" maxlength="30">
+      </div>
+
+      <div class="builder-exercises">
+        <p class="hint">Add exercises to your routine:</p>
+        <ul id="builder-list" class="exercise-list"></ul>
+      </div>
+
+      <div class="setup-field">
+        <label>Add Exercise</label>
+        <select id="builder-exercise-select" class="text-input">
+          <option value="">Choose...</option>
+        </select>
+      </div>
+
+      <div class="setup-field">
+        <label for="builder-custom-name">Or custom</label>
+        <div class="custom-input" style="margin:0">
+          <input type="text" id="builder-custom-name" placeholder="Name" maxlength="30">
+          <button id="builder-add-custom" class="btn btn-sm">+ Add</button>
+        </div>
+      </div>
+
+      <div class="setup-field">
+        <label for="builder-rest">Rest between sets (sec)</label>
+        <div class="stepper">
+          <button class="stepper-btn" data-target="builder-rest" data-dir="-5">&minus;</button>
+          <input type="number" id="builder-rest" value="30" min="5" max="300" step="5">
+          <button class="stepper-btn" data-target="builder-rest" data-dir="5">+</button>
+        </div>
+      </div>
+
+      <button id="save-routine-btn" class="btn btn-primary btn-lg">Save Routine</button>
+    </div>
+  </div>
+
+  <!-- ============ EXERCISE PICKER SCREEN ============ -->
+  <div id="screen-picker" class="screen">
+    <header class="top-bar">
+      <button class="icon-btn back-btn" data-back="home" aria-label="Back">&larr;</button>
+      <h1 class="logo">Quick Exercise</h1>
+      <button id="theme-toggle-p" class="icon-btn" aria-label="Toggle dark mode">
+        <span class="icon-sun">&#9728;</span>
+        <span class="icon-moon">&#9790;</span>
+      </button>
+    </header>
+
+    <div class="picker-body">
       <div class="category-tabs">
         <button class="tab active" data-category="hiit">HIIT</button>
         <button class="tab" data-category="strength">Strength</button>
@@ -28,7 +152,6 @@
 
       <ul id="exercise-list" class="exercise-list"></ul>
 
-      <!-- Custom exercise input -->
       <div id="custom-input" class="custom-input hidden">
         <input type="text" id="custom-name" placeholder="Exercise name" maxlength="30">
         <button id="add-custom-btn" class="btn btn-sm">+ Add</button>
@@ -41,7 +164,7 @@
     <header class="top-bar">
       <button id="back-to-picker" class="icon-btn" aria-label="Back">&larr;</button>
       <h1 id="setup-title" class="logo">Exercise</h1>
-      <div></div>
+      <div style="width:42px"></div>
     </header>
 
     <div class="setup-body">
@@ -96,13 +219,21 @@
     <header class="top-bar">
       <button id="quit-workout" class="icon-btn" aria-label="Quit workout">&larr;</button>
       <h1 id="workout-title" class="logo">Exercise</h1>
-      <button id="theme-toggle-2" class="icon-btn" aria-label="Toggle dark mode">
-        <span class="icon-sun">&#9728;</span>
-        <span class="icon-moon">&#9790;</span>
-      </button>
+      <span id="elapsed-time" class="elapsed-time">0:00</span>
     </header>
 
+    <!-- WOD progress bar (multi-exercise) -->
+    <div id="wod-progress" class="wod-progress hidden">
+      <div id="wod-progress-inner" class="wod-progress-inner"></div>
+      <span id="wod-progress-label" class="wod-progress-label">Exercise 1/4</span>
+    </div>
+
     <div class="workout-body">
+      <!-- Last time hint -->
+      <div id="last-time-hint" class="last-time-hint hidden">
+        <span>Last time: <strong id="last-time-text"></strong></span>
+      </div>
+
       <!-- Timer -->
       <div id="timer-container" class="timer-container">
         <div id="timer-ring" class="timer-ring">
@@ -143,6 +274,16 @@
         </div>
       </div>
 
+      <!-- Weight adjuster (mid-set) -->
+      <div class="reps-adjuster">
+        <p class="hint">Weight this set (lbs):</p>
+        <div class="stepper stepper-lg">
+          <button id="weight-minus" class="stepper-btn">&minus;</button>
+          <span id="actual-weight" class="actual-reps">0</span>
+          <button id="weight-plus" class="stepper-btn">+</button>
+        </div>
+      </div>
+
       <!-- Action button -->
       <button id="complete-set-btn" class="btn btn-primary btn-lg">Complete Set</button>
 
@@ -154,19 +295,62 @@
   <!-- ============ DONE SCREEN ============ -->
   <div id="screen-done" class="screen">
     <header class="top-bar">
-      <div></div>
+      <div style="width:42px"></div>
       <h1 class="logo">FitTrack</h1>
-      <div></div>
+      <div style="width:42px"></div>
     </header>
 
     <div class="done-body">
       <div class="done-icon">&#10003;</div>
       <h2>Workout Complete!</h2>
+      <div id="pr-badges" class="pr-badges hidden"></div>
+      <p id="done-duration" class="done-duration"></p>
       <div id="done-summary" class="done-summary"></div>
-      <button id="done-btn" class="btn btn-primary btn-lg">Back to Exercises</button>
+      <button id="restart-btn" class="btn btn-lg" style="margin-bottom:8px">Do This Again</button>
+      <button id="done-btn" class="btn btn-primary btn-lg">Back to Home</button>
+    </div>
+  </div>
+
+  <!-- ============ HISTORY SCREEN ============ -->
+  <div id="screen-history" class="screen">
+    <header class="top-bar">
+      <button class="icon-btn back-btn" data-back="home" aria-label="Back">&larr;</button>
+      <h1 class="logo">History</h1>
+      <button id="theme-toggle-h" class="icon-btn" aria-label="Toggle dark mode">
+        <span class="icon-sun">&#9728;</span>
+        <span class="icon-moon">&#9790;</span>
+      </button>
+    </header>
+
+    <div class="history-body">
+      <!-- Calendar -->
+      <div class="calendar">
+        <div class="calendar-header">
+          <button id="cal-prev" class="icon-btn">&larr;</button>
+          <span id="cal-month" class="cal-month">February 2026</span>
+          <button id="cal-next" class="icon-btn">&rarr;</button>
+        </div>
+        <div class="calendar-weekdays">
+          <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+        </div>
+        <div id="cal-grid" class="calendar-grid"></div>
+      </div>
+
+      <!-- Workout log list -->
+      <div id="history-filter" class="history-filter hidden">
+        <span id="history-filter-text"></span>
+        <button id="clear-filter" class="btn btn-sm">Show All</button>
+      </div>
+      <ul id="history-list" class="exercise-list"></ul>
+      <p id="history-empty" class="hint" style="text-align:center;padding:32px;">No workouts yet. Get started!</p>
     </div>
   </div>
 
   <script src="app.js"></script>
+  <script>
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/sw.js").catch(() => {});
+    }
+  </script>
 </body>
 </html>
