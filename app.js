@@ -607,15 +607,16 @@ function beginExercise(exerciseName) {
 }
 
 // ================================================================
-//  ELAPSED TIMER
+//  ELAPSED TIMER (shown in the ring when not resting)
 // ================================================================
 function startElapsedTimer() {
   clearInterval(state.elapsedInterval);
   state.elapsedInterval = setInterval(() => {
-    const elapsed = Math.floor((Date.now() - state.workoutStartTime) / 1000);
-    $("elapsed-time").textContent = formatTime(elapsed);
+    if (!state.isResting) {
+      const elapsed = Math.floor((Date.now() - state.workoutStartTime) / 1000);
+      $("timer-display").textContent = formatTime(elapsed);
+    }
   }, 1000);
-  $("elapsed-time").textContent = "0:00";
 }
 
 function stopElapsedTimer() {
@@ -644,8 +645,10 @@ function resetTimerDisplay() {
   clearInterval(state.timerInterval);
   state.timerInterval = null;
   state.isResting = false;
-  $("timer-display").textContent = formatTime(state.restSeconds);
-  $("timer-label").textContent = "REST";
+  // Show elapsed workout time in the ring
+  const elapsed = getElapsedSeconds();
+  $("timer-display").textContent = formatTime(elapsed);
+  $("timer-label").textContent = "WORKOUT";
   setRingProgress(1);
   $("ring-progress").classList.remove("resting");
   $("complete-set-btn").textContent = "Start Set";

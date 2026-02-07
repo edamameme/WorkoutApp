@@ -493,18 +493,6 @@ select.text-input {
   padding-top: 4px;
 }
 
-/* Elapsed time */
-.elapsed-time {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--text-muted);
-  font-variant-numeric: tabular-nums;
-  background: var(--surface);
-  padding: 6px 12px;
-  border-radius: 20px;
-  border: 1px solid var(--border);
-}
-
 /* WOD progress bar */
 .wod-progress {
   width: 100%;
