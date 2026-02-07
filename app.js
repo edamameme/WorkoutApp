@@ -548,9 +548,6 @@ function startWod(routine) {
   state.restSeconds = routine.rest;
   state.weight = 0;
 
-  state.workoutStartTime = Date.now();
-  startElapsedTimer();
-
   beginExercise(routine.exercises[0]);
   updateWodProgress();
 }
@@ -579,12 +576,9 @@ function beginExercise(exerciseName) {
   state.totalRepsAccum = 0;
   state.setLog = [];
   state.isResting = false;
+  state.timerStarted = false;
 
-  // Start elapsed timer only for single exercise
-  if (!state.isWod) {
-    state.workoutStartTime = Date.now();
-    startElapsedTimer();
-  }
+  // Don't start elapsed timer yet — wait for first "Start Set" tap
 
   // Last time hint
   const s = getExerciseStats(exerciseName);
@@ -645,10 +639,10 @@ function resetTimerDisplay() {
   clearInterval(state.timerInterval);
   state.timerInterval = null;
   state.isResting = false;
-  // Show elapsed workout time in the ring
-  const elapsed = getElapsedSeconds();
+  // Show elapsed workout time in the ring (or 0:00 if not started)
+  const elapsed = state.timerStarted ? getElapsedSeconds() : 0;
   $("timer-display").textContent = formatTime(elapsed);
-  $("timer-label").textContent = "WORKOUT";
+  $("timer-label").textContent = state.timerStarted ? "WORKOUT" : "READY";
   setRingProgress(1);
   $("ring-progress").classList.remove("resting");
   $("complete-set-btn").textContent = "Start Set";
@@ -743,6 +737,13 @@ $("complete-set-btn").addEventListener("click", () => {
     updateWorkoutUI();
     resetTimerDisplay();
     return;
+  }
+
+  // Start the elapsed timer on first tap
+  if (!state.timerStarted) {
+    state.timerStarted = true;
+    state.workoutStartTime = Date.now();
+    startElapsedTimer();
   }
 
   state.setLog.push({
