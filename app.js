@@ -704,6 +704,7 @@ function startRestTimer() {
       playBeep();
       if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
 
+      logCurrentSet();
       state.currentSet++;
       state.actualReps = state.targetReps;
       updateWorkoutUI();
@@ -727,6 +728,7 @@ $("complete-set-btn").addEventListener("click", () => {
     state.timerInterval = null;
     state.isResting = false;
     $("ring-progress").classList.remove("resting");
+    logCurrentSet();
     state.currentSet++;
     state.actualReps = state.targetReps;
     updateWorkoutUI();
@@ -741,6 +743,19 @@ $("complete-set-btn").addEventListener("click", () => {
     startElapsedTimer();
   }
 
+  // Last set — log immediately and finish (no rest needed)
+  if (state.currentSet >= state.totalSets) {
+    logCurrentSet();
+    finishExercise();
+    return;
+  }
+
+  // Start rest — set will be logged when rest ends so user can adjust reps
+  startRestTimer();
+});
+
+// ---------- Log Current Set ----------
+function logCurrentSet() {
   state.setLog.push({
     set: state.currentSet,
     reps: state.actualReps,
@@ -748,14 +763,7 @@ $("complete-set-btn").addEventListener("click", () => {
   });
   state.totalRepsAccum += state.actualReps;
   $("total-reps").textContent = state.totalRepsAccum;
-
-  if (state.currentSet >= state.totalSets) {
-    finishExercise();
-    return;
-  }
-
-  startRestTimer();
-});
+}
 
 // ---------- Finish Exercise ----------
 function finishExercise() {
